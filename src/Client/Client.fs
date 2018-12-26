@@ -11,9 +11,7 @@ open Thoth.Json
 
 open Shared
 
-
 open Fulma
-
 
 // The model holds data that you want to keep track of while the application is running
 // in this case, we are keeping track of a counter
@@ -41,8 +39,6 @@ let init () : Model * Cmd<Msg> =
             (Error >> InitialCountLoaded)
     initialModel, loadCountCmd
 
-
-
 // The update function computes the next state of the application based on the current state and the incoming events/messages
 // It can also run side-effects (encoded as commands) like calling the server via Http.
 // these commands in turn, can dispatch messages to which the update function will react.
@@ -59,7 +55,6 @@ let update (msg : Msg) (currentModel : Model) : Model * Cmd<Msg> =
         nextModel, Cmd.none
 
     | _ -> currentModel, Cmd.none
-
 
 let safeComponents =
     let components =
