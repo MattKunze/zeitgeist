@@ -1,13 +1,12 @@
 open System.IO
 
-open Microsoft.AspNetCore.Builder
 open Microsoft.Extensions.DependencyInjection
 open Saturn
 
 let publicPath = Path.GetFullPath "../Client/public"
 let port = 8085us
 
-let configureSerialization (services:IServiceCollection) =
+let configureSerialization (services : IServiceCollection) =
     services.AddSingleton<Giraffe.Serialization.Json.IJsonSerializer>(Thoth.Json.Giraffe.ThothSerializer())
 
 let app = application {
