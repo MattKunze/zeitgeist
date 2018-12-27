@@ -16,7 +16,7 @@ open Shared
 // the initial value will be requested from server
 type Model = {
     Counter: Counter option
-    History: list<Message> option
+    History: Message list option
 }
 
 // The Msg type defines what events/actions can occur while the application is running
@@ -25,10 +25,10 @@ type Msg =
 | Increment
 | Decrement
 | InitialCountLoaded of Result<Counter, exn>
-| InitialHistoryLoaded of Result<list<Message>, exn>
+| InitialHistoryLoaded of Result<Message list, exn>
 
 let initialCounter = fetchAs<Counter> "/api/init" (Decode.Auto.generateDecoder())
-let initialHistory = fetchAs<list<Message>> "/api/history" (Decode.Auto.generateDecoder())
+let initialHistory = fetchAs<Message list> "/api/history" (Decode.Auto.generateDecoder())
 
 let loadData task msg =
     Cmd.ofPromise
@@ -94,19 +94,19 @@ let counter model dispatch =
             Column.column [] [ button "+" (fun _ -> dispatch Increment) ] ] ]
 
 let cardMargin = Props [ Style [ CSSProp.Margin "1em 0" ] ]
-let messageCard (message : Shared.Message) =
+let messageCard pos (message : Shared.Message) =
     Card.card [ cardMargin ] [
         Card.header [] [
             Card.Header.title []
-                [ str message.Source ] ]
+                [ str (sprintf "%d: %s" pos message.Source) ] ]
         Card.content [] [
             Content.content [] [
-                str message.Message ] ] ]
+                str message.Title ] ] ]
 
 let history model dispatch =
     Container.container [] (
         match model with
-        | { History = Some history } -> List.map messageCard history
+        | { History = Some history } -> List.mapi messageCard history
         | { History = None } -> [ str "Loading..." ]
     )
 

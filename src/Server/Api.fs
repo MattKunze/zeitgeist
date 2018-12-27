@@ -14,29 +14,7 @@ open System.ComponentModel.DataAnnotations
 
 let private getInitCounter() : Task<Counter> = task { return { Value = 42 } }
 
-let mutable private history = [
-    {
-        Source = "baked in"
-        Message = "fake message"
-        Timestamp = DateTime.Now
-    }
-]
-
-let getHistory next ctx =
-    json history next ctx
-
-let pushHistory (source, message) (next: HttpFunc) (ctx: HttpContext) =
-    let logger = ctx.GetLogger "pushHistory"
-    logger.LogWarning("push {s} - {m} ({l})", source, message, history.Length)
-    |> ignore
-
-    let msg = {
-        Source = source
-        Message = message
-        Timestamp = DateTime.Now
-    }
-    history <- msg :: history
-    json history next ctx
+let mutable private history : Message list = []
 
 let webApp = router {
     get "/api/init" (fun next ctx ->
@@ -48,5 +26,31 @@ let webApp = router {
         task {
             return! json history next ctx
         })
-    getf "/api/push/%s/%s" pushHistory
+    getf "/api/push/%s/%s" (fun req next ctx ->
+        let source, title = req
+
+        let msg = {
+            Id = Guid.NewGuid().ToString()
+            Timestamp = DateTime.Now
+            Source = source
+            Title = title
+            Link = None
+            Author = None
+        }
+        history <- msg :: history
+        json history next ctx
+    )
+    getf "/api/rss/%s" (fun url next ctx ->
+        task {
+            let currentIds =
+                history |> List.map (fun m -> m.Id)
+
+            let! results = RssFeed.fetchResults url
+            history <- results
+                |> List.filter (fun t -> not (List.contains t.Id currentIds))
+                |> List.append history
+
+            return! json history next ctx
+        }
+    )
 }

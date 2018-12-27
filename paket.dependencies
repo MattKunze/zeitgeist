@@ -4,6 +4,7 @@ group Server
     storage: none
 
     nuget FSharp.Core
+    nuget FSharp.Data
     nuget Saturn
     nuget Thoth.Json.Giraffe
 

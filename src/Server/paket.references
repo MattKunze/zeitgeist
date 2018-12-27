@@ -1,4 +1,5 @@
 group Server
     FSharp.Core
+    FSharp.Data
     Saturn
     Thoth.Json.Giraffe

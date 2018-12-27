@@ -5,7 +5,10 @@ open System
 type Counter = { Value : int }
 
 type Message = {
-    Source : string
-    Message : string
+    Id: string
     Timestamp: DateTime
+    Source : string
+    Title : string
+    Link : string option
+    Author : string option
 }
