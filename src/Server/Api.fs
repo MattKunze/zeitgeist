@@ -53,4 +53,13 @@ let webApp = router {
             return! json history next ctx
         }
     )
+    post "/api/gitlab" (fun next ctx ->
+        let logger = ctx.GetLogger "gitlab"
+        task {
+            let! request = ctx.ReadBodyFromRequestAsync()
+            logger.LogWarning ("got: " + request) |> ignore
+
+            return! json "ok" next ctx
+        }
+    )
 }
